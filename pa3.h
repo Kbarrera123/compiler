@@ -15,22 +15,22 @@ public:
 
 class Stack {
 private:
-  std::vector<char> stackList;
+  std::vector<std::string> stackList;
 public:
-  char peek();
-  void push(char item);
+  std::string peek();
+  void push(std::string item);
   void pop();
   bool isEmpty();
 };
 
-void Stack::push(char item){
+void Stack::push(std::string item){
   stackList.push_back(item);
 }
 void Stack::pop(){
   stackList.pop_back();
 }
 
-char Stack::peek(){
+std::string Stack::peek(){
   return stackList.back();
 }
 bool Stack::isEmpty(){
