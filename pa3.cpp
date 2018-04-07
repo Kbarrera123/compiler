@@ -8,6 +8,20 @@
 
 using namespace std;
 
+void Stack::push(std::string item){
+  stackList.push_back(item);
+}
+void Stack::pop(){
+  stackList.pop_back();
+}
+
+std::string Stack::peek(){
+  return stackList.back();
+}
+bool Stack::isEmpty(){
+  return stackList.empty();
+}
+
 void checkKeyword(std::ifstream& file, Stack* stack) {
   std::string line;
   char currChar;
