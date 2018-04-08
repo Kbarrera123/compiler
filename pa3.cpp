@@ -166,6 +166,30 @@ void checkConstants(std::ifstream& file) {
 
 }
 
+void checkParentheses(std::ifstream& file, Stack* stack) {
+  char currChar;
+
+  file.clear();
+  file.seekg(0, ios::beg);  //Clear file and go back to beginning
+
+  while (file.get(currChar)) {
+    if (currChar == '(') {
+      std::cout<<"Pushing ( to stack"<<std::endl;
+      stack->push("(");
+    }
+    else if (currChar == ')') {
+      if (!stack->isEmpty()) { //if stack is not empty
+        std::cout<<"Popping opening paren from stack"<<std::endl;
+        stack->pop(); //pop the opening parens
+      }
+      else {
+        std::cout<<"Stack is empty; cannot pop"<<std::endl;
+      }
+    }
+  }
+
+}
+
 void checkKeywords(std::ifstream& file, Stack* stack) {
   char currChar;
   std::string possKey;
@@ -218,6 +242,7 @@ int main() {
     checkKeywords(file, stack);
     std::cout<<"\nThe depth of nested loop(s) is "<<std::endl;
     std::cout<<"\nKeywords: "<<std::endl;
+    checkParentheses(file, stack);
     std::cout<<"Identifier: ";
     checkIdentifiers(file);
     std::cout<<"\nConstant: ";
