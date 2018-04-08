@@ -136,7 +136,7 @@ void checkIdentifiers(std::ifstream& file) {
     }
   }
 
-  for (std::unordered_set<std::string, int>::iterator it=idList.begin(); it != idList.end(); ++it) {
+  for (std::unordered_set<std::string>::iterator it=idList.begin(); it != idList.end(); ++it) {
     std::cout<<*it<<" ";
   }
 
