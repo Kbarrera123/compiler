@@ -22,6 +22,67 @@ bool Stack::isEmpty(){
   return stackList.empty();
 }
 
+void checkOperators(std::ifstream& file) { //Prints out each unique operator
+  char currChar;
+  bool hasPlus = false;
+  bool hasMinus = false;
+  bool hasMulti = false;
+  bool hasEqual = false;
+  bool hasInc = false;
+  bool hasDiv = false;
+
+  file.clear();
+  file.seekg(0, ios::beg);
+
+  while (file.get(currChar)) {
+    switch (currChar){
+      case '+':
+        if (file.peek() == '+') { //if increment operator
+          hasInc = true;
+          file.seekg(1, std::ios::cur); //move to next char to skip the second +
+        }
+        else { //if just single plus
+          hasPlus = true;
+        }
+        continue;
+      case '-':
+        hasMinus = true;
+        continue;
+      case '/':
+        hasDiv = true;
+        continue;
+      case '*':
+        hasMulti = true;
+        continue;
+      case '=':
+        hasEqual = true;
+        continue;
+      default:
+        continue;
+    }
+  }
+
+  if (hasPlus) {
+    std::cout<<"+ ";
+  }
+  if (hasMinus) {
+    std::cout<<"- ";
+  }
+  if (hasDiv) {
+    std::cout<<"/ ";
+  }
+  if (hasEqual) {
+    std::cout<<"= ";
+  }
+  if (hasInc) {
+    std::cout<<"++ ";
+  }
+  if (hasMulti) {
+    std::cout<<"* ";
+  }
+
+}
+
 std::string checkDelimiter(std::ifstream& file) { //Returns a string containing the delimeters
   char currChar;
   bool hasSpace = false;
@@ -108,8 +169,9 @@ int main() {
     std::cout<<"\nKeywords: "<<std::endl;
     std::cout<<"Identifier: "<<std::endl;
     std::cout<<"Constant: "<<std::endl;
-    std::cout<<"Operators: "<<std::endl;
-    std::cout<<"Delimiter: "<<checkDelimiter(file)<<std::endl;
+    std::cout<<"Operators: ";
+    checkOperators(file);
+    std::cout<<"\nDelimiter: "<<checkDelimiter(file)<<std::endl;
     std::cout<<"\nSyntax Error(s): "<<std::endl;
   }
  else {
