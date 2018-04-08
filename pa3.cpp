@@ -67,11 +67,17 @@ void checkKeyword(std::ifstream& file, Stack* stack) {
       if (file.peek() == ' ' || file.peek() == '\n') { //if next char is a space or new line
         possKey+=currChar;
         if(possKey.compare("END") == 0) {
-          std::cout<<"popping "<<stack->peek()<<std::endl;
-          stack->pop(); //pop BEGIN
-          std::cout<<"popping "<<stack->peek()<<std::endl;
-          stack->pop(); //pop FOR
-          possKey = "";
+          if (!stack->isEmpty()) {
+            std::cout<<"popping "<<stack->peek()<<std::endl;
+            stack->pop(); //pop BEGIN
+            std::cout<<"popping "<<stack->peek()<<std::endl;
+            stack->pop(); //pop FOR
+            possKey = "";
+          }
+          else {
+            std::cout<<"Cannot pop; stack is empty."<<std::endl;
+            return;
+          }
         }
         else { //if not "END", push the keyword to the stack
           std::cout<<"pushing "<<possKey<<" to stack"<<std::endl;
