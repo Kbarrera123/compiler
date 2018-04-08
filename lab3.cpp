@@ -5,17 +5,6 @@
 #include <iterator>
 
 
-void addWord(std::string word, std::vector<std::string> &wordList, std::vector<int> frequency) {
-  for (int i = 0; i < wordList.size(); i++) {
-    if (word == wordList[i]) {
-      frequency[i]++;
-      return;
-    }
-  }
-  wordList.push_back(word);
-  frequency.push_back(1);
-}
-
 int main() {
   //prints exactly as in files
   //By input
