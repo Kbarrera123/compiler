@@ -140,17 +140,6 @@ void checkIdentifiers(std::ifstream& file) {
     std::cout<<*it<<" ";
   }
 
-  // std::string word;
-  // std::unordered_set<std::string, int> wordFrequency;
-  //
-  // while (file>>word) {
-  //   wordFrequency[word]++; //hashes the word, increases frequency, does everything
-  //
-  // }
-  // for(std::unordered_set<std::string, int>::iterator it=wordFrequency.begin(); it != wordFrequency.end(); ++it) {
-  //   std::cout<<it->first<<" Frequency: "<<it->second<<std::endl;
-  // }
-
 }
 
 void checkKeywords(std::ifstream& file, Stack* stack) {
@@ -165,8 +154,13 @@ void checkKeywords(std::ifstream& file, Stack* stack) {
           if (!stack->isEmpty()) {
             std::cout<<"popping "<<stack->peek()<<std::endl;
             stack->pop(); //pop BEGIN
-            std::cout<<"popping "<<stack->peek()<<std::endl;
-            stack->pop(); //pop FOR
+            if (!stack->isEmpty()) {
+              std::cout<<"popping "<<stack->peek()<<std::endl;
+              stack->pop(); //pop FOR
+            }
+            else {
+              std::cout<<"Cannot pop; stack is now empty"<<std::endl;
+            }
             possKey = "";
           }
           else {
