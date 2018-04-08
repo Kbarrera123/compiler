@@ -171,8 +171,8 @@ void checkKeywords(std::ifstream& file, Stack* stack) {
   std::string possKey;
 
   while (file.get(currChar)) { //returns true if file
-    if (isupper(currChar) != 0) {  //if the char is uppercase
-      if (file.peek() == ' ' || file.peek() == '\n') { //if next char is a space or new line
+    if (isupper(currChar)) {  //if the char is uppercase
+      if (!isupper(file.peek())) { //if next char is not an uppercase char
         possKey+=currChar;
         if(possKey.compare("END") == 0) {
           if (!stack->isEmpty()) {
