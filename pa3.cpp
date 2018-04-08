@@ -15,11 +15,46 @@ void Stack::pop(){
   stackList.pop_back();
 }
 
-std::string Stack::peek(){ //returns the last elemnt in the stack
+std::string Stack::peek(){ //returns the last element in the stack
   return stackList.back();
 }
 bool Stack::isEmpty(){
   return stackList.empty();
+}
+
+std::string checkDelimiter(std::ifstream& file) { //Returns a string containing the delimeters
+  char currChar;
+  bool hasSpace = false;
+  bool hasSemicolon = false;
+  bool hasComma = false;
+  std::string delimString;
+
+  file.clear();
+  file.seekg(0, ios::beg);  //Clear file and go back to beginning
+
+  while (file.get(currChar)) {
+    if (currChar == ' ') {
+      hasSpace = true;
+    }
+    if (currChar == ';') {
+      hasSemicolon = true;
+    }
+    if (currChar == ',') {
+      hasComma = true;
+    }
+  }
+
+  if (hasSpace) {
+    delimString+=' ';
+  }
+  if (hasSemicolon) {
+    delimString+=';';
+  }
+  if (hasComma) {
+    delimString+=',';
+  }
+
+  return delimString;
 }
 
 void checkKeyword(std::ifstream& file, Stack* stack) {
@@ -30,18 +65,23 @@ void checkKeyword(std::ifstream& file, Stack* stack) {
   while (file.get(currChar)) { //returns true if file
     if (isupper(currChar) != 0) {  //if the char is uppercase
       if (file.peek() == ' ' || file.peek() == '\n') { //if next char is a space or new line
-      //if ((currChar + 1) != ' ' && !file.eof()) {
-         //std::cout<<currChar;
-         possKey+=currChar;
-         std::cout<<"pushing "<<possKey<<" to stack"<<std::endl;
-         stack->push(possKey);
-         possKey = "";
+        possKey+=currChar;
+        if(possKey.compare("END") == 0) {
+          std::cout<<"popping "<<stack->peek()<<std::endl;
+          stack->pop(); //pop BEGIN
+          std::cout<<"popping "<<stack->peek()<<std::endl;
+          stack->pop(); //pop FOR
+          possKey = "";
+        }
+        else { //if not "END", push the keyword to the stack
+          std::cout<<"pushing "<<possKey<<" to stack"<<std::endl;
+          stack->push(possKey);
+          possKey = "";
+        }
      }
-     else {
+     else { //if no space, continue appending the char to a string
        possKey+=currChar;
-       //append to string
      }
-      //check if it is a keyword
   }
  }
 }
@@ -57,21 +97,20 @@ int main() {
 
   if (file) {
     checkKeyword(file, stack);
+
+    std::cout<<"\nThe depth of nested loop(s) is "<<std::endl;
+    std::cout<<"\nKeywords: "<<std::endl;
+    std::cout<<"Identifier: "<<std::endl;
+    std::cout<<"Constant: "<<std::endl;
+    std::cout<<"Operators: "<<std::endl;
+    std::cout<<"Delimiter: "<<checkDelimiter(file)<<std::endl;
+    std::cout<<"\nSyntax Error(s): "<<std::endl;
   }
  else {
    std::cout<<"This file does not exist"<<std::endl;
    return -1;
  }
-
  file.close();
+ return 0;
 
- std::cout<<"\nThe depth of nested loop(s) is "<<std::endl;
- std::cout<<"\nKeywords: "<<std::endl;
- std::cout<<"Identifier: "<<std::endl;
- std::cout<<"Constant: "<<std::endl;
- std::cout<<"Operators: "<<std::endl;
- std::cout<<"Delimiter: "<<std::endl;
- std::cout<<"\nSyntax Error(s): "<<std::endl;
-
-  return 0;
 }
