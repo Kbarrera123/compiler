@@ -15,7 +15,7 @@ void Stack::pop(){
   stackList.pop_back();
 }
 
-std::string Stack::peek(){
+std::string Stack::peek(){ //returns the last elemnt in the stack
   return stackList.back();
 }
 bool Stack::isEmpty(){
