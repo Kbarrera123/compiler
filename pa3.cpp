@@ -83,7 +83,7 @@ void checkOperators(std::ifstream& file) { //Prints out each unique operator
 
 }
 
-std::string checkDelimiter(std::ifstream& file) { //Returns a string containing the delimeters
+std::string checkDelimiters(std::ifstream& file) { //Returns a string containing the delimeters
   char currChar;
   bool hasSpace = false;
   bool hasSemicolon = false;
@@ -118,8 +118,26 @@ std::string checkDelimiter(std::ifstream& file) { //Returns a string containing 
   return delimString;
 }
 
-void checkKeyword(std::ifstream& file, Stack* stack) {
-  std::string line;
+void checkIdentifiers(std::ifstream& file) {
+  char currChar;
+  std::string possId;
+  std::vector<string> idVector;
+
+  file.clear();
+  file.seekg(0, ios::beg);  //Clear file and go back to beginning
+
+  while (file.get(currChar)) {
+    if (islower(currChar) != 0) { //if char is lowercase
+      possId+=currChar;
+      if (!islower(file.peek())) { //if next char is not another lowercase char
+        idVector.push_back(possId);
+        possId = "";
+      }
+    }
+  }
+}
+
+void checkKeywords(std::ifstream& file, Stack* stack) {
   char currChar;
   std::string possKey;
 
@@ -163,7 +181,7 @@ int main() {
   std::ifstream file(fileLocation.c_str()); //to get input from a filestream; take in location of file as param
 
   if (file) {
-    checkKeyword(file, stack);
+    checkKeywords(file, stack);
 
     std::cout<<"\nThe depth of nested loop(s) is "<<std::endl;
     std::cout<<"\nKeywords: "<<std::endl;
@@ -171,7 +189,7 @@ int main() {
     std::cout<<"Constant: "<<std::endl;
     std::cout<<"Operators: ";
     checkOperators(file);
-    std::cout<<"\nDelimiter: "<<checkDelimiter(file)<<std::endl;
+    std::cout<<"\nDelimiter: "<<checkDelimiters(file)<<std::endl;
     std::cout<<"\nSyntax Error(s): "<<std::endl;
   }
  else {
