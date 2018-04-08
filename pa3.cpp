@@ -127,17 +127,41 @@ void checkIdentifiers(std::ifstream& file) {
   file.seekg(0, ios::beg);  //Clear file and go back to beginning
 
   while (file.get(currChar)) {
-    if (islower(currChar) != 0) { //if char is lowercase
+    if (islower(currChar)) { //if char is lowercase
       possId+=currChar;
       if (!islower(file.peek())) { //if next char is not another lowercase char
-        idList.insert(possId);
+        idList.insert(possId); //add it to unordered set
         possId = "";
       }
     }
   }
 
   for (std::unordered_set<std::string>::iterator it=idList.begin(); it != idList.end(); ++it) {
-    std::cout<<*it<<" ";
+    std::cout<<*it<<" "; //print each value of set (they are all unique)
+  }
+
+}
+
+void checkConstants(std::ifstream& file) {
+  char currChar;
+  std::string possConst;
+  std::unordered_set<std::string> constList;
+
+  file.clear();
+  file.seekg(0, ios::beg);  //Clear file and go back to beginning
+
+  while (file.get(currChar)) {
+    if (isdigit(currChar) != 0) { //if char is a digit
+      possConst+=currChar; //append it to a string
+      if (!isdigit(file.peek()) ) { //if next char is not another number
+        constList.insert(possConst); //add it to unordered set
+        possConst = "";
+      }
+    }
+  }
+
+  for (std::unordered_set<std::string>::iterator it=constList.begin(); it != constList.end(); ++it) {
+    std::cout<<*it<<" "; //print each value of set (they are all unique)
   }
 
 }
@@ -196,8 +220,9 @@ int main() {
     std::cout<<"\nKeywords: "<<std::endl;
     std::cout<<"Identifier: ";
     checkIdentifiers(file);
-    std::cout<<"\nConstant: "<<std::endl;
-    std::cout<<"Operators: ";
+    std::cout<<"\nConstant: ";
+    checkConstants(file);
+    std::cout<<"\nOperators: ";
     checkOperators(file);
     std::cout<<"\nDelimiter: "<<checkDelimiters(file)<<std::endl;
     std::cout<<"\nSyntax Error(s): "<<std::endl;
