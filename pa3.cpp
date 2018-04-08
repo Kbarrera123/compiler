@@ -3,7 +3,7 @@
 #include <string>
 #include <fstream> //to read and write from files
 #include <vector>
-#include <map>
+#include <unordered_set>
 #include <iterator>
 
 using namespace std;
@@ -121,7 +121,7 @@ std::string checkDelimiters(std::ifstream& file) { //Returns a string containing
 void checkIdentifiers(std::ifstream& file) {
   char currChar;
   std::string possId;
-  std::vector<string> idVector;
+  std::unordered_set<std::string> idList;
 
   file.clear();
   file.seekg(0, ios::beg);  //Clear file and go back to beginning
@@ -130,11 +130,27 @@ void checkIdentifiers(std::ifstream& file) {
     if (islower(currChar) != 0) { //if char is lowercase
       possId+=currChar;
       if (!islower(file.peek())) { //if next char is not another lowercase char
-        idVector.push_back(possId);
+        idList.insert(possId);
         possId = "";
       }
     }
   }
+
+  for (std::unordered_set<std::string, int>::iterator it=idList.begin(); it != idList.end(); ++it) {
+    std::cout<<*it<<" ";
+  }
+
+  // std::string word;
+  // std::unordered_set<std::string, int> wordFrequency;
+  //
+  // while (file>>word) {
+  //   wordFrequency[word]++; //hashes the word, increases frequency, does everything
+  //
+  // }
+  // for(std::unordered_set<std::string, int>::iterator it=wordFrequency.begin(); it != wordFrequency.end(); ++it) {
+  //   std::cout<<it->first<<" Frequency: "<<it->second<<std::endl;
+  // }
+
 }
 
 void checkKeywords(std::ifstream& file, Stack* stack) {
@@ -182,11 +198,11 @@ int main() {
 
   if (file) {
     checkKeywords(file, stack);
-
     std::cout<<"\nThe depth of nested loop(s) is "<<std::endl;
     std::cout<<"\nKeywords: "<<std::endl;
-    std::cout<<"Identifier: "<<std::endl;
-    std::cout<<"Constant: "<<std::endl;
+    std::cout<<"Identifier: ";
+    checkIdentifiers(file);
+    std::cout<<"\nConstant: "<<std::endl;
     std::cout<<"Operators: ";
     checkOperators(file);
     std::cout<<"\nDelimiter: "<<checkDelimiters(file)<<std::endl;
