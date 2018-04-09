@@ -185,12 +185,12 @@ void checkParentheses(std::ifstream& file) { //Print mismatched parens
   }
 
   while (balance < 0) { //is negative
-    std::cout<<")";
+    std::cout<<") ";
     balance++;
   }
 
   while (balance > 0) {
-    std::cout<<"(";
+    std::cout<<"( ";
     balance--;
   }
 
@@ -232,7 +232,54 @@ std::string checkKeywords(std::ifstream& file, bool printKeywords) {
 }
 
 void keywordErrorHelper(std::ifstream& file) {
-  std::cout<<checkKeywords(file, false)<<std::endl;
+  std::cout<<checkKeywords(file, false);
+}
+
+void checkLoops(std::ifstream& file, Stack* stack) {
+  char currChar;
+  std::string possKey = "";
+
+  file.clear();
+  file.seekg(0, ios::beg);  //Clear file and go back to beginning
+
+  while (file.get(currChar)) {
+    if (isupper(currChar)) {
+      possKey+=currChar;
+      if (!isupper(file.peek())) { //if next char is not uppercase, end that possKey
+        if (possKey.compare("BEGIN") == 0 || possKey.compare("FOR") == 0) { //push fors and begins
+          stack->push(possKey);
+          possKey = "";
+        }
+        else if (possKey.compare("END") == 0 && stack->peek().compare("BEGIN") == 0) {
+          //If you get end and have a begin
+          stack->pop(); //pop the begin
+          stack->pop(); //pop the for
+          possKey = "";
+        }
+        else if (possKey.compare("END") == 0 && stack->peek().compare("BEGIN") != 0) {
+          //if you get end and no begin
+          std::cout<<"BEGIN"<<std::endl;
+          stack->pop(); //pop the for
+          possKey = "";
+        }
+        else { //If keyword is misspelled, ignore and start over
+          possKey = "";
+        }
+      }
+    }
+  }
+
+  while (!stack->isEmpty()) {
+    std::cout<<"END"<<std::endl;
+    if (stack->peek().compare("FOR") == 0) {
+      stack->pop();
+    }
+    else if (stack->peek().compare("BEGIN") == 0) {
+      stack->pop();
+      stack->pop();
+    }
+  }
+
 }
 
 int main() {
@@ -259,6 +306,7 @@ int main() {
     std::cout<<"\nSyntax Error(s): ";
     keywordErrorHelper(file);
     checkParentheses(file);
+    checkLoops(file, stack);
     std::cout<<"\n\n"<<std::endl;
 
   }
