@@ -235,9 +235,17 @@ void keywordErrorHelper(std::ifstream& file) {
   std::cout<<checkKeywords(file, false);
 }
 
-void checkLoops(std::ifstream& file, Stack* stack) {
+void checkLoops(std::ifstream& file, Stack* stack, bool wantDepth) {
   char currChar;
   std::string possKey = "";
+  int currDepth = 0;
+  int tempDepth = 0;
+  int maxDepth = 0;
+  bool justPopped = false;
+
+  if (!stack->isEmpty()) {
+    std::cout<<"stack is not empty"<<std::endl;
+  }
 
   file.clear();
   file.seekg(0, ios::beg);  //Clear file and go back to beginning
@@ -246,19 +254,36 @@ void checkLoops(std::ifstream& file, Stack* stack) {
     if (isupper(currChar)) {
       possKey+=currChar;
       if (!isupper(file.peek())) { //if next char is not uppercase, end that possKey
-        if (possKey.compare("BEGIN") == 0 || possKey.compare("FOR") == 0) { //push fors and begins
+        if (possKey.compare("FOR") == 0) { //push fors
           stack->push(possKey);
           possKey = "";
+        }
+        else if (possKey.compare("BEGIN") == 0) { //push begins
+          stack->push(possKey);
+          possKey = "";
+          if (justPopped) {
+            justPopped = false;
+            continue;
+          }
+          currDepth++;
         }
         else if (possKey.compare("END") == 0 && stack->peek().compare("BEGIN") == 0) {
           //If you get end and have a begin
           stack->pop(); //pop the begin
           stack->pop(); //pop the for
+          justPopped = true;
           possKey = "";
+          currDepth--;
+          tempDepth++;
+          if (currDepth == 0 && tempDepth > maxDepth) {
+            maxDepth = tempDepth;
+          }
         }
         else if (possKey.compare("END") == 0 && stack->peek().compare("BEGIN") != 0) {
           //if you get end and no begin
-          std::cout<<"BEGIN"<<std::endl;
+          if (!wantDepth) {
+            std::cout<<"BEGIN"<<std::endl;
+          }
           stack->pop(); //pop the for
           possKey = "";
         }
@@ -270,7 +295,9 @@ void checkLoops(std::ifstream& file, Stack* stack) {
   }
 
   while (!stack->isEmpty()) {
-    std::cout<<"END"<<std::endl;
+    if (!wantDepth) {
+        std::cout<<"END"<<std::endl;
+    }
     if (stack->peek().compare("FOR") == 0) {
       stack->pop();
     }
@@ -278,6 +305,10 @@ void checkLoops(std::ifstream& file, Stack* stack) {
       stack->pop();
       stack->pop();
     }
+  }
+
+  if (wantDepth) {
+    std::cout<<maxDepth<<std::endl;
   }
 
 }
@@ -293,8 +324,9 @@ int main() {
 
   if (file) {
 
-    std::cout<<"\nThe depth of nested loop(s) is "<<std::endl;
-    std::cout<<"\nKeywords: ";
+    std::cout<<"\nThe depth of nested loop(s) is ";
+    checkLoops(file, stack, true);
+    std::cout<<"\n\nKeywords: ";
     checkKeywords(file, true);
     std::cout<<"\nIdentifier: ";
     checkIdentifiers(file);
@@ -306,7 +338,7 @@ int main() {
     std::cout<<"\nSyntax Error(s): ";
     keywordErrorHelper(file);
     checkParentheses(file);
-    checkLoops(file, stack);
+    checkLoops(file, stack, false);
     std::cout<<"\n\n"<<std::endl;
 
   }
