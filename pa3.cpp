@@ -166,8 +166,9 @@ void checkConstants(std::ifstream& file) {
 
 }
 
-void checkParentheses(std::ifstream& file) { //Print mismatched parens
+bool checkParentheses(std::ifstream& file, bool printErrors) { //Print mismatched parens
   char currChar;
+  bool isBalanced = false;
   int balance = 0;
   //postive = extra open parens
   //negative = extra closed parens
@@ -184,15 +185,23 @@ void checkParentheses(std::ifstream& file) { //Print mismatched parens
     }
   }
 
-  while (balance < 0) { //is negative
-    std::cout<<") ";
-    balance++;
+  if (balance == 0) {
+    isBalanced = true;
   }
 
-  while (balance > 0) {
-    std::cout<<"( ";
-    balance--;
+  if (printErrors) { //only print if in syntax error mode
+    while (balance < 0) { //is negative
+      std::cout<<") ";
+      balance++;
+    }
+
+    while (balance > 0) {
+      std::cout<<"( ";
+      balance--;
+    }
   }
+
+  return isBalanced;
 
 }
 
@@ -242,6 +251,7 @@ void checkLoops(std::ifstream& file, Stack* stack, bool wantDepth) {
   int tempDepth = 0;
   int maxDepth = 0;
   bool justPopped = false;
+  bool parensBalance = checkParentheses(file, false);
 
   if (!stack->isEmpty()) {
     std::cout<<"stack is not empty"<<std::endl;
@@ -265,7 +275,9 @@ void checkLoops(std::ifstream& file, Stack* stack, bool wantDepth) {
             justPopped = false;
             continue;
           }
-          currDepth++;
+          if (parensBalance) {
+            currDepth++;
+          }
         }
         else if (possKey.compare("END") == 0 && stack->peek().compare("BEGIN") == 0) {
           //If you get end and have a begin
@@ -337,7 +349,7 @@ int main() {
     std::cout<<"\nDelimiter: "<<checkDelimiters(file)<<std::endl;
     std::cout<<"\nSyntax Error(s): ";
     keywordErrorHelper(file);
-    checkParentheses(file);
+    checkParentheses(file, true);
     checkLoops(file, stack, false);
     std::cout<<"\n\n"<<std::endl;
 
