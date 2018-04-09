@@ -250,6 +250,7 @@ void checkLoops(std::ifstream& file, Stack* stack, bool wantDepth) {
   int currDepth = 0;
   int tempDepth = 0;
   int maxDepth = 0;
+  int numMissingEnds = 0;
   bool justPopped = false;
   bool parensBalance = checkParentheses(file, false);
 
@@ -294,7 +295,7 @@ void checkLoops(std::ifstream& file, Stack* stack, bool wantDepth) {
         else if (possKey.compare("END") == 0 && stack->peek().compare("BEGIN") != 0) {
           //if you get end and no begin
           if (!wantDepth) {
-            std::cout<<"BEGIN"<<std::endl;
+            std::cout<<"BEGIN ";
           }
           stack->pop(); //pop the for
           possKey = "";
@@ -307,6 +308,7 @@ void checkLoops(std::ifstream& file, Stack* stack, bool wantDepth) {
   }
 
   while (!stack->isEmpty()) {
+    numMissingEnds++;
     if (!wantDepth) {
         std::cout<<"END"<<std::endl;
     }
@@ -320,6 +322,7 @@ void checkLoops(std::ifstream& file, Stack* stack, bool wantDepth) {
   }
 
   if (wantDepth) {
+    maxDepth = maxDepth + numMissingEnds;
     std::cout<<maxDepth<<std::endl;
   }
 
@@ -338,20 +341,20 @@ int main() {
 
     std::cout<<"\nThe depth of nested loop(s) is ";
     checkLoops(file, stack, true);
-    std::cout<<"\n\nKeywords: ";
+    std::cout<<"\nKeywords: ";
     checkKeywords(file, true);
-    std::cout<<"\nIdentifier: ";
+    std::cout<<"\nIdentifiers: ";
     checkIdentifiers(file);
-    std::cout<<"\nConstant: ";
+    std::cout<<"\nConstants: ";
     checkConstants(file);
     std::cout<<"\nOperators: ";
     checkOperators(file);
-    std::cout<<"\nDelimiter: "<<checkDelimiters(file)<<std::endl;
+    std::cout<<"\nDelimiters: "<<checkDelimiters(file);
     std::cout<<"\nSyntax Error(s): ";
     keywordErrorHelper(file);
     checkParentheses(file, true);
     checkLoops(file, stack, false);
-    std::cout<<"\n\n"<<std::endl;
+    std::cout<<"\n"<<std::endl;
 
   }
  else {
