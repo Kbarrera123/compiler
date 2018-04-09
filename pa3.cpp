@@ -252,6 +252,7 @@ void checkLoops(std::ifstream& file, Stack* stack, bool wantDepth) {
   int maxDepth = 0;
   int numMissingEnds = 0;
   bool justPopped = false;
+  bool hasEnd = false;
   bool parensBalance = checkParentheses(file, false);
 
   if (!stack->isEmpty()) {
@@ -282,6 +283,7 @@ void checkLoops(std::ifstream& file, Stack* stack, bool wantDepth) {
         }
         else if (possKey.compare("END") == 0 && stack->peek().compare("BEGIN") == 0) {
           //If you get end and have a begin
+          hasEnd = true;
           stack->pop(); //pop the begin
           stack->pop(); //pop the for
           justPopped = true;
@@ -294,6 +296,7 @@ void checkLoops(std::ifstream& file, Stack* stack, bool wantDepth) {
         }
         else if (possKey.compare("END") == 0 && stack->peek().compare("BEGIN") != 0) {
           //if you get end and no begin
+          hasEnd = true;
           if (!wantDepth) {
             std::cout<<"BEGIN ";
           }
@@ -322,7 +325,9 @@ void checkLoops(std::ifstream& file, Stack* stack, bool wantDepth) {
   }
 
   if (wantDepth) {
-    maxDepth = maxDepth + numMissingEnds;
+    if (hasEnd) {
+      maxDepth = maxDepth + numMissingEnds;
+    }
     std::cout<<maxDepth<<std::endl;
   }
 
