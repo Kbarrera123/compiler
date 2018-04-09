@@ -199,7 +199,7 @@ void checkParentheses(std::ifstream& file) { //Print mismatched parens
 int checkKeywords(std::ifstream& file, Stack* stack) {
   char currChar;
   std::string possKey;
-  int depth;
+  int depth = 0;
 
   while (file.get(currChar)) { //returns true if file
     if (isupper(currChar)) {  //if the char is uppercase
