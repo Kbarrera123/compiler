@@ -166,33 +166,40 @@ void checkConstants(std::ifstream& file) {
 
 }
 
-void checkParentheses(std::ifstream& file, Stack* stack) {
+void checkParentheses(std::ifstream& file) { //Print mismatched parens
   char currChar;
+  int balance = 0;
+  //postive = extra open parens
+  //negative = extra closed parens
 
   file.clear();
   file.seekg(0, ios::beg);  //Clear file and go back to beginning
 
   while (file.get(currChar)) {
     if (currChar == '(') {
-      std::cout<<"Pushing ( to stack"<<std::endl;
-      stack->push("(");
+      balance++;
     }
     else if (currChar == ')') {
-      if (!stack->isEmpty()) { //if stack is not empty
-        std::cout<<"Popping opening paren from stack"<<std::endl;
-        stack->pop(); //pop the opening parens
-      }
-      else {
-        std::cout<<"Stack is empty; cannot pop"<<std::endl;
-      }
+      balance--;
     }
+  }
+
+  while (balance < 0) { //is negative
+    std::cout<<")";
+    balance++;
+  }
+
+  while (balance > 0) {
+    std::cout<<"(";
+    balance--;
   }
 
 }
 
-void checkKeywords(std::ifstream& file, Stack* stack) {
+int checkKeywords(std::ifstream& file, Stack* stack) {
   char currChar;
   std::string possKey;
+  int depth;
 
   while (file.get(currChar)) { //returns true if file
     if (isupper(currChar)) {  //if the char is uppercase
@@ -213,7 +220,7 @@ void checkKeywords(std::ifstream& file, Stack* stack) {
           }
           else {
             std::cout<<"Cannot pop; stack is empty."<<std::endl;
-            return;
+            break;
           }
         }
         else { //if not "END", push the keyword to the stack
@@ -225,8 +232,11 @@ void checkKeywords(std::ifstream& file, Stack* stack) {
      else { //if no space, continue appending the char to a string
        possKey+=currChar;
      }
+   }
   }
- }
+
+ return depth;
+
 }
 
 int main() {
@@ -239,10 +249,9 @@ int main() {
   std::ifstream file(fileLocation.c_str()); //to get input from a filestream; take in location of file as param
 
   if (file) {
-    checkKeywords(file, stack);
-    std::cout<<"\nThe depth of nested loop(s) is "<<std::endl;
+
+    std::cout<<"\nThe depth of nested loop(s) is "<<checkKeywords(file, stack)<<std::endl;
     std::cout<<"\nKeywords: "<<std::endl;
-    checkParentheses(file, stack);
     std::cout<<"Identifier: ";
     checkIdentifiers(file);
     std::cout<<"\nConstant: ";
@@ -250,7 +259,10 @@ int main() {
     std::cout<<"\nOperators: ";
     checkOperators(file);
     std::cout<<"\nDelimiter: "<<checkDelimiters(file)<<std::endl;
-    std::cout<<"\nSyntax Error(s): "<<std::endl;
+    std::cout<<"\nSyntax Error(s): ";
+    checkParentheses(file);
+    std::cout<<"\n\n"<<std::endl;
+
   }
  else {
    std::cout<<"This file does not exist"<<std::endl;
