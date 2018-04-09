@@ -196,47 +196,43 @@ void checkParentheses(std::ifstream& file) { //Print mismatched parens
 
 }
 
-int checkKeywords(std::ifstream& file, Stack* stack) {
+std::string checkKeywords(std::ifstream& file, bool printKeywords) {
   char currChar;
   std::string possKey;
-  int depth = 0;
+  std::string wrongKey;
+  std::unordered_set<std::string> keywordList;
 
-  while (file.get(currChar)) { //returns true if file
-    if (isupper(currChar)) {  //if the char is uppercase
-      if (!isupper(file.peek())) { //if next char is not an uppercase char
-        possKey+=currChar;
-        if(possKey.compare("END") == 0) {
-          if (!stack->isEmpty()) {
-            std::cout<<"popping "<<stack->peek()<<std::endl;
-            stack->pop(); //pop BEGIN
-            if (!stack->isEmpty()) {
-              std::cout<<"popping "<<stack->peek()<<std::endl;
-              stack->pop(); //pop FOR
-            }
-            else {
-              std::cout<<"Cannot pop; stack is now empty"<<std::endl;
-            }
-            possKey = "";
-          }
-          else {
-            std::cout<<"Cannot pop; stack is empty."<<std::endl;
-            break;
-          }
-        }
-        else { //if not "END", push the keyword to the stack
-          std::cout<<"pushing "<<possKey<<" to stack"<<std::endl;
-          stack->push(possKey);
+  file.clear();
+  file.seekg(0, ios::beg);  //Clear file and go back to beginning
+
+  while (file.get(currChar)) {
+    if (isupper(currChar)) {
+      possKey+=currChar;
+      if (!isupper(file.peek())) { //if next char is not uppercase, end that possKey
+        if (possKey.compare("BEGIN") == 0 || possKey.compare("END") == 0 || possKey.compare("FOR") == 0) {
+          keywordList.insert(possKey);
           possKey = "";
         }
-     }
-     else { //if no space, continue appending the char to a string
-       possKey+=currChar;
-     }
-   }
+        else {
+          possKey+=" ";
+          wrongKey+=possKey;
+          possKey = "";
+        }
+      }
+    }
   }
 
- return depth;
+  if (printKeywords) {
+    for (std::unordered_set<std::string>::iterator it=keywordList.begin(); it != keywordList.end(); ++it) {
+      std::cout<<*it<<" "; //print each value of set (they are all unique)
+    }
+  }
 
+  return wrongKey;
+}
+
+void keywordErrorHelper(std::ifstream& file) {
+  std::cout<<checkKeywords(file, false)<<std::endl;
 }
 
 int main() {
@@ -250,9 +246,10 @@ int main() {
 
   if (file) {
 
-    std::cout<<"\nThe depth of nested loop(s) is "<<checkKeywords(file, stack)<<std::endl;
-    std::cout<<"\nKeywords: "<<std::endl;
-    std::cout<<"Identifier: ";
+    std::cout<<"\nThe depth of nested loop(s) is "<<std::endl;
+    std::cout<<"\nKeywords: ";
+    checkKeywords(file, true);
+    std::cout<<"\nIdentifier: ";
     checkIdentifiers(file);
     std::cout<<"\nConstant: ";
     checkConstants(file);
@@ -260,6 +257,7 @@ int main() {
     checkOperators(file);
     std::cout<<"\nDelimiter: "<<checkDelimiters(file)<<std::endl;
     std::cout<<"\nSyntax Error(s): ";
+    keywordErrorHelper(file);
     checkParentheses(file);
     std::cout<<"\n\n"<<std::endl;
 
